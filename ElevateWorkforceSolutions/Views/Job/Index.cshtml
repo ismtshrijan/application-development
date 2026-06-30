@@ -1,6 +1,11 @@
 @model JobListViewModel
 @{
     ViewData["Title"] = "Browse Jobs";
+    var jobsList = Model.Jobs as PaginatedList<Job>;
+    var pageIndex = jobsList?.PageIndex ?? 1;
+    var totalPages = jobsList?.TotalPages ?? 1;
+    var hasPrevious = jobsList?.HasPreviousPage ?? false;
+    var hasNext = jobsList?.HasNextPage ?? false;
 }
 
 <h1>Browse Jobs</h1>
@@ -59,14 +64,6 @@ else
             </div>
         }
     </div>
-
-    @{
-        var jobsList = Model.Jobs as PaginatedList<Job>;
-        var pageIndex = jobsList?.PageIndex ?? 1;
-        var totalPages = jobsList?.TotalPages ?? 1;
-        var hasPrevious = jobsList?.HasPreviousPage ?? false;
-        var hasNext = jobsList?.HasNextPage ?? false;
-    }
 
     @if (totalPages > 1)
     {
