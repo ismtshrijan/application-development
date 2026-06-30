@@ -1,0 +1,101 @@
+@model JobDetailsViewModel
+@{
+    ViewData["Title"] = Model.Job.Title;
+}
+
+<div class="mb-3">
+    <a asp-controller="Job" asp-action="Index" class="text-decoration-none">&larr; Back to Jobs</a>
+</div>
+
+<h1>@Model.Job.Title</h1>
+<h5 class="text-muted">@Model.Job.Company?.CompanyName</h5>
+
+<hr />
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h5>Description</h5>
+        <p class="text-pre-wrap">@Model.Job.Description</p>
+
+        <h5>Details</h5>
+        <dl class="row">
+            <dt class="col-sm-3">Location</dt>
+            <dd class="col-sm-9">@Model.Job.Location</dd>
+
+            <dt class="col-sm-3">Employment Type</dt>
+            <dd class="col-sm-9">@Model.Job.EmploymentType</dd>
+
+            <dt class="col-sm-3">Salary</dt>
+            <dd class="col-sm-9">
+                @if (Model.Job.SalaryMin.HasValue && Model.Job.SalaryMax.HasValue)
+                {
+                    <text>$@Model.Job.SalaryMin.Value.ToString("N0") – $@Model.Job.SalaryMax.Value.ToString("N0")</text>
+                }
+                else if (Model.Job.SalaryMin.HasValue)
+                {
+                    <text>From $@Model.Job.SalaryMin.Value.ToString("N0")</text>
+                }
+                else if (Model.Job.SalaryMax.HasValue)
+                {
+                    <text>Up to $@Model.Job.SalaryMax.Value.ToString("N0")</text>
+                }
+                else
+                {
+                    <text>Not specified</text>
+                }
+            </dd>
+
+            <dt class="col-sm-3">Posted</dt>
+            <dd class="col-sm-9">@Model.Job.PostedDate.ToString("MMM dd, yyyy")</dd>
+
+            <dt class="col-sm-3">Closing Date</dt>
+            <dd class="col-sm-9">@Model.Job.ClosingDate.ToString("MMM dd, yyyy")</dd>
+
+            <dt class="col-sm-3">Industry</dt>
+            <dd class="col-sm-9">@Model.Job.Company?.Industry</dd>
+        </dl>
+    </div>
+
+    <div class="col-md-4">
+        @if (Model.Job.Company != null)
+        {
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@Model.Job.Company.CompanyName</h5>
+                    <p class="card-text">
+                        <strong>Industry:</strong> @Model.Job.Company.Industry<br />
+                        @if (!string.IsNullOrEmpty(Model.Job.Company.Website))
+                        {
+                            <strong>Website:</strong> <a href="@Model.Job.Company.Website" target="_blank">@Model.Job.Company.Website</a>
+                        }
+                    </p>
+                    @if (!string.IsNullOrEmpty(Model.Job.Company.Description))
+                    {
+                        <p class="card-text">@Model.Job.Company.Description</p>
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="mt-3 d-grid gap-2">
+            @if (User.Identity.IsAuthenticated && User.IsInRole("Applicant") && !Model.HasApplied)
+            {
+                <a asp-controller="Application" asp-action="Apply" asp-route-jobId="@Model.Job.Id" class="btn btn-success btn-lg">Apply Now</a>
+            }
+            else if (User.Identity.IsAuthenticated && User.IsInRole("Applicant") && Model.HasApplied)
+            {
+                <button class="btn btn-secondary btn-lg" disabled>Already Applied</button>
+            }
+            else if (!User.Identity.IsAuthenticated)
+            {
+                <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path" class="btn btn-primary btn-lg">Login to Apply</a>
+            }
+
+            @if (Model.IsOwner)
+            {
+                <a asp-controller="Job" asp-action="Edit" asp-route-id="@Model.Job.Id" class="btn btn-warning">Edit</a>
+                <a asp-controller="Job" asp-action="Delete" asp-route-id="@Model.Job.Id" class="btn btn-danger">Delete</a>
+            }
+        </div>
+    </div>
+</div>

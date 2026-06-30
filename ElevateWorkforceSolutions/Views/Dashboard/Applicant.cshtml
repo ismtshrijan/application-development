@@ -1,0 +1,63 @@
+@model IEnumerable<JobApplication>
+@{
+    ViewData["Title"] = "My Applications";
+}
+
+<h1>My Applications</h1>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        You haven't applied to any jobs yet.
+        <a asp-controller="Job" asp-action="Index" class="alert-link">Browse jobs</a> to get started.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Job Title</th>
+                    <th>Company</th>
+                    <th>Applied Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var application in Model)
+                {
+                    <tr>
+                        <td>
+                            <a asp-controller="Job" asp-action="Details" asp-route-id="@application.JobId">
+                                @application.Job?.Title
+                            </a>
+                        </td>
+                        <td>@application.Job?.Company?.CompanyName</td>
+                        <td>@application.AppliedDate.ToString("MMM dd, yyyy")</td>
+                        <td>
+                            @switch (application.Status)
+                            {
+                                case ApplicationStatus.Submitted:
+                                    <span class="badge bg-secondary">Submitted</span>
+                                    break;
+                                case ApplicationStatus.UnderReview:
+                                    <span class="badge bg-info">Under Review</span>
+                                    break;
+                                case ApplicationStatus.Shortlisted:
+                                    <span class="badge bg-warning text-dark">Shortlisted</span>
+                                    break;
+                                case ApplicationStatus.Rejected:
+                                    <span class="badge bg-danger">Rejected</span>
+                                    break;
+                                case ApplicationStatus.Hired:
+                                    <span class="badge bg-success">Hired</span>
+                                    break;
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

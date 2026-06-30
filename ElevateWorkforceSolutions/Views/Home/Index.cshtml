@@ -1,0 +1,38 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to Elevate Workforce Solutions</h1>
+    <p class="lead">Find your next opportunity or hire top talent in the workforce solutions industry.</p>
+
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Browse Jobs</h5>
+                    <p class="card-text">Explore available job listings from leading companies across various industries.</p>
+                    <a class="btn btn-primary" asp-controller="Job" asp-action="Index">View Jobs</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Register as Company</h5>
+                    <p class="card-text">Post job openings and find the best candidates for your organization.</p>
+                    <a class="btn btn-success" asp-controller="Account" asp-action="RegisterCompany">Get Started</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Register as Applicant</h5>
+                    <p class="card-text">Create your profile and start applying to jobs that match your skills.</p>
+                    <a class="btn btn-success" asp-controller="Account" asp-action="RegisterApplicant">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

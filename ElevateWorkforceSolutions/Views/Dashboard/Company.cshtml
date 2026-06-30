@@ -1,0 +1,148 @@
+@model CompanyDashboardViewModel
+@{
+    ViewData["Title"] = "Company Dashboard";
+}
+
+<h1>Company Dashboard</h1>
+
+@if (!Model.Jobs.Any())
+{
+    <div class="alert alert-info">
+        You haven't posted any jobs yet.
+        <a asp-controller="Job" asp-action="Create" class="alert-link">Post your first job</a>.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Location</th>
+                    <th>Type</th>
+                    <th>Posted</th>
+                    <th>Applications</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var job in Model.Jobs)
+                {
+                    <tr>
+                        <td>
+                            <strong>@job.Title</strong>
+                            @if (!job.IsActive)
+                            {
+                                <span class="badge bg-secondary ms-1">Closed</span>
+                            }
+                        </td>
+                        <td>@job.Location</td>
+                        <td>@job.EmploymentType</td>
+                        <td>@job.PostedDate.ToString("MMM dd, yyyy")</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-info" type="button" data-bs-toggle="collapse" data-bs-target="#applicants-@job.Id">
+                                @job.Applications.Count application(s)
+                            </button>
+                        </td>
+                        <td>
+                            @if (job.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Closed</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-controller="Job" asp-action="Edit" asp-route-id="@job.Id" class="btn btn-sm btn-warning">Edit</a>
+                            <a asp-controller="Job" asp-action="Delete" asp-route-id="@job.Id" class="btn btn-sm btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                    <tr class="collapse" id="applicants-@job.Id">
+                        <td colspan="7">
+                            @if (!job.Applications.Any())
+                            {
+                                <div class="text-muted p-2">No applications yet.</div>
+                            }
+                            else
+                            {
+                                <table class="table table-sm mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Applicant</th>
+                                            <th>Headline</th>
+                                            <th>Applied</th>
+                                            <th>Status</th>
+                                            <th>Cover Letter</th>
+                                            <th>Update Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var app in job.Applications)
+                                        {
+                                            <tr>
+                                                <td>@app.Applicant?.FullName</td>
+                                                <td>@app.Applicant?.Headline</td>
+                                                <td>@app.AppliedDate.ToString("MMM dd, yyyy")</td>
+                                                <td>
+                                                    @switch (app.Status)
+                                                    {
+                                                        case ApplicationStatus.Submitted:
+                                                            <span class="badge bg-secondary">Submitted</span>
+                                                            break;
+                                                        case ApplicationStatus.UnderReview:
+                                                            <span class="badge bg-info">Under Review</span>
+                                                            break;
+                                                        case ApplicationStatus.Shortlisted:
+                                                            <span class="badge bg-warning text-dark">Shortlisted</span>
+                                                            break;
+                                                        case ApplicationStatus.Rejected:
+                                                            <span class="badge bg-danger">Rejected</span>
+                                                            break;
+                                                        case ApplicationStatus.Hired:
+                                                            <span class="badge bg-success">Hired</span>
+                                                            break;
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (!string.IsNullOrEmpty(app.CoverLetter))
+                                                    {
+                                                        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#cover-@app.Id">View</button>
+                                                        <div class="collapse mt-2" id="cover-@app.Id">
+                                                            <div class="card card-body p-2">
+                                                                @app.CoverLetter
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">None</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <form asp-controller="Application" asp-action="UpdateStatus" method="post" class="d-flex gap-1">
+                                                        <input type="hidden" name="applicationId" value="@app.Id" />
+                                                        <select name="newStatus" class="form-select form-select-sm" style="width:auto;">
+                                                            @foreach (var status in Enum.GetValues<ApplicationStatus>())
+                                                            {
+                                                                <option value="@status" selected="@(status == app.Status)">@status</option>
+                                                            }
+                                                        </select>
+                                                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

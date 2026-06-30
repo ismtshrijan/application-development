@@ -1,0 +1,55 @@
+@model JobCreateEditViewModel
+@{
+    ViewData["Title"] = "Delete Job";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="alert alert-warning">
+    <h4>Are you sure you want to delete this job?</h4>
+    <p>This action will deactivate the job listing. Existing applications will be preserved.</p>
+</div>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">Title</dt>
+        <dd class="col-sm-9">@Model.Title</dd>
+
+        <dt class="col-sm-3">Description</dt>
+        <dd class="col-sm-9">@Model.Description</dd>
+
+        <dt class="col-sm-3">Location</dt>
+        <dd class="col-sm-9">@Model.Location</dd>
+
+        <dt class="col-sm-3">Employment Type</dt>
+        <dd class="col-sm-9">@Model.EmploymentType</dd>
+
+        <dt class="col-sm-3">Salary</dt>
+        <dd class="col-sm-9">
+            @if (Model.SalaryMin.HasValue && Model.SalaryMax.HasValue)
+            {
+                <text>$@Model.SalaryMin.Value.ToString("N0") – $@Model.SalaryMax.Value.ToString("N0")</text>
+            }
+            else if (Model.SalaryMin.HasValue)
+            {
+                <text>From $@Model.SalaryMin.Value.ToString("N0")</text>
+            }
+            else if (Model.SalaryMax.HasValue)
+            {
+                <text>Up to $@Model.SalaryMax.Value.ToString("N0")</text>
+            }
+            else
+            {
+                <text>Not specified</text>
+            }
+        </dd>
+
+        <dt class="col-sm-3">Closing Date</dt>
+        <dd class="col-sm-9">@Model.ClosingDate.ToString("MMM dd, yyyy")</dd>
+    </dl>
+
+    <form asp-action="DeleteConfirmed" method="post" asp-route-id="@Model.Id">
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a asp-controller="Job" asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>

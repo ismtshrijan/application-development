@@ -1,0 +1,30 @@
+@model ApplyViewModel
+@{
+    ViewData["Title"] = "Apply for Job";
+}
+
+<h1>Apply for @Model.JobTitle</h1>
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Apply" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <input asp-for="JobId" type="hidden" />
+            <input asp-for="JobTitle" type="hidden" />
+
+            <div class="mb-3">
+                <label asp-for="CoverLetter" class="form-label"></label>
+                <textarea asp-for="CoverLetter" class="form-control" rows="8" placeholder="Tell the employer why you're a great fit for this role..."></textarea>
+                <span asp-validation-for="CoverLetter" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-success">Submit Application</button>
+            <a asp-controller="Job" asp-action="Details" asp-route-id="@Model.JobId" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

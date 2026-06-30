@@ -1,0 +1,90 @@
+@model JobListViewModel
+@{
+    ViewData["Title"] = "Browse Jobs";
+}
+
+<h1>Browse Jobs</h1>
+
+<form asp-action="Index" method="get" class="row g-3 mb-4">
+    <div class="col-md-5">
+        <input type="text" name="search" class="form-control" placeholder="Search by title or keyword..." value="@Model.SearchTerm" />
+    </div>
+    <div class="col-md-5">
+        <input type="text" name="location" class="form-control" placeholder="Filter by location..." value="@Model.Location" />
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+</form>
+
+@if (!Model.Jobs.Any())
+{
+    <div class="alert alert-info">No jobs found matching your criteria.</div>
+}
+else
+{
+    <div class="row">
+        @foreach (var job in Model.Jobs)
+        {
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">@job.Title</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">@job.Company?.CompanyName</h6>
+                        <p class="card-text">
+                            <span class="d-block"><strong>Location:</strong> @job.Location</span>
+                            <span class="d-block"><strong>Type:</strong> @job.EmploymentType</span>
+                            <span class="d-block job-salary">
+                                @if (job.SalaryMin.HasValue && job.SalaryMax.HasValue)
+                                {
+                                    <text>$@job.SalaryMin.Value.ToString("N0") – $@job.SalaryMax.Value.ToString("N0")</text>
+                                }
+                                else if (job.SalaryMin.HasValue)
+                                {
+                                    <text>From $@job.SalaryMin.Value.ToString("N0")</text>
+                                }
+                                else if (job.SalaryMax.HasValue)
+                                {
+                                    <text>Up to $@job.SalaryMax.Value.ToString("N0")</text>
+                                }
+                                else
+                                {
+                                    <text>Not specified</text>
+                                }
+                            </span>
+                        </p>
+                        <a asp-controller="Job" asp-action="Details" asp-route-id="@job.Id" class="btn btn-outline-primary">View details</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @{
+        var jobsList = Model.Jobs as PaginatedList<Job>;
+        var pageIndex = jobsList?.PageIndex ?? 1;
+        var totalPages = jobsList?.TotalPages ?? 1;
+        var hasPrevious = jobsList?.HasPreviousPage ?? false;
+        var hasNext = jobsList?.HasNextPage ?? false;
+    }
+
+    @if (totalPages > 1)
+    {
+        <nav>
+            <ul class="pagination">
+                <li class="page-item @(hasPrevious ? "" : "disabled")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(pageIndex - 1)" asp-route-search="@Model.SearchTerm" asp-route-location="@Model.Location">Previous</a>
+                </li>
+                @for (var i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == pageIndex ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-search="@Model.SearchTerm" asp-route-location="@Model.Location">@i</a>
+                    </li>
+                }
+                <li class="page-item @(hasNext ? "" : "disabled")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(pageIndex + 1)" asp-route-search="@Model.SearchTerm" asp-route-location="@Model.Location">Next</a>
+                </li>
+            </ul>
+        </nav>
+    }
+}
